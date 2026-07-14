@@ -26,16 +26,26 @@ $ErrorActionPreference = "Stop"
 
 try {
     Write-Host "Checking environment variables..." -ForegroundColor Cyan
-    
+
     $vCenterServer = $env:VCENTER_HOST
     $vCenterUsername = $env:VCENTER_USERNAME
     $vCenterPassword = $env:VCENTER_PASSWORD
-    
-    if (-not $vCenterServer -or -not $vCenterUsername -or -not $vCenterPassword) {
-        throw "Missing required environment variables. Please set VCENTER_HOST, VCENTER_USERNAME, and VCENTER_PASSWORD."
+
+    if (-not $vCenterServer) {
+        $vCenterServer = Read-Host "VCENTER_HOST not set. Enter vCenter server hostname or IP"
     }
-    
-    Write-Host "Environment variables found." -ForegroundColor Green
+    if (-not $vCenterUsername) {
+        $vCenterUsername = Read-Host "VCENTER_USERNAME not set. Enter vCenter username"
+    }
+    if (-not $vCenterPassword) {
+        $securePasswordInput = Read-Host "VCENTER_PASSWORD not set. Enter vCenter password" -AsSecureString
+        $vCenterPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($securePasswordInput))
+    }
+
+    if (-not $vCenterServer -or -not $vCenterUsername -or -not $vCenterPassword) {
+        throw "Missing required vCenter connection information."
+    }
+
     Write-Host "Connecting to vCenter: $vCenterServer" -ForegroundColor Cyan
     
     $securePassword = ConvertTo-SecureString $vCenterPassword -AsPlainText -Force
@@ -133,3 +143,36 @@ try {
         Write-Host "Disconnected." -ForegroundColor Green
     }
 }
+
+# SIG # Begin signature block
+# MIIFfAYJKoZIhvcNAQcCoIIFbTCCBWkCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
+# gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUUK7E04q7GbIlXSHGQcNZZbsk
+# dbOgggMSMIIDDjCCAfagAwIBAgIQNANyaT2m96pPJErLs1AwKjANBgkqhkiG9w0B
+# AQsFADAfMR0wGwYDVQQDDBR2RGVmZW5kIENvZGUgU2lnbmluZzAeFw0yNjA3MTQy
+# MDM4MzlaFw0yNzA3MTQyMDU4MzlaMB8xHTAbBgNVBAMMFHZEZWZlbmQgQ29kZSBT
+# aWduaW5nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAw0RJd4ilDI7I
+# iz7avz5HYDm14hbAvRCOTZs95izSWm21IAtPtljh6zta39SAih89Du7C+RVj9vjD
+# b2HMblmrIZUlS5WjuPV0GoL1HOBemb8SZvUpDoMUs9Sydz7y3iDX+TNhagSu15x+
+# AlcluuiVVAusIT1QJTfJxS1K+D/qKPv8PrxFonWlDHzkoR2mvjbdXeXrCVVMk2Yy
+# 5nXGDNmKgy9RuV4fMXkiLwy42QTOkZfT/aO1vM3Grs9SF8surKFNts3B1uaXAZ2s
+# /RxftJpRxfqR9edbVOqjA+IZ3+xHgE8HohYx+1TUCgw5DyTC7q+OvCDa62yQ6K82
+# z66wsM1xqQIDAQABo0YwRDAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYB
+# BQUHAwMwHQYDVR0OBBYEFHULkVrxwenUoAppjo/H2kbbhHZ1MA0GCSqGSIb3DQEB
+# CwUAA4IBAQBPNJEyrMPujUXSf8Dn8//f9d0Ux7BB0ibDfZOu42MFXyuVqlgcM8Ns
+# F1JNt+renyiV1yWxmyJ8uqmnAnzwqajFSUZdSEGRxnistjAwW4iYiSLJ8AymcWFi
+# cx3oXLRwBHhu2E/Tl7SI7n1vupKq+JKGzk+vYZVgt6wg1o9ekplBbEpDI94F7UZL
+# oXCWAFshbiLIEWu+Cf9I+bUch76rsJcT85p6yTgPP2Wt3mZ8LBybA2KJKbvbPwH1
+# 2dveEsj1jFXhRPGUI87oVq+mArpV77a6upVTsSU9cJ+TDmdxh6bqwkCZpEYq0D3D
+# dzY3UDSMXYo3noIMjhK+TqsCFyPvHHYYMYIB1DCCAdACAQEwMzAfMR0wGwYDVQQD
+# DBR2RGVmZW5kIENvZGUgU2lnbmluZwIQNANyaT2m96pPJErLs1AwKjAJBgUrDgMC
+# GgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkqhkiG9w0BCQMxDAYK
+# KwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG
+# 9w0BCQQxFgQUeRlTqgIuzJgcLJT5J1b9rJ2FFacwDQYJKoZIhvcNAQEBBQAEggEA
+# i++caHxwAJ+huqpw3Bb9hzW5H1XjsGSgxQ9HV/qx853dTS2e/NqVkZXTR+FI+Iht
+# AU+z+9FUAHhTjGFMnZOVzP0xHc1FDHL+PG8oHD5Kloj+R1B2MTTlfV/cQ+5w4bs+
+# gb/tVfUMC36NNAazTjD+5tdGXEbajv7jX25LZ1nVKH4stgiXHgNJnVroLyWZ88E1
+# CKY33MePIwIxN4V3IDDNv5ZBN+hMxjxd3uMVDrRGrkyFzOKz3vqgzBPIBe9Aj2HS
+# QXhc3QgW5mBHuRt2MWtvuw7YdniO4kO8J4RrR3QDrhqwliLvVQT7viMNKRbAeJbQ
+# mjjJ5CsPb4qTaUvkUkLGnA==
+# SIG # End signature block
